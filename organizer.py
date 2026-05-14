@@ -2,12 +2,19 @@ import os
 import shutil
 import hashlib
 import argparse
+import logging
+
+logging.basicConfig(
+    filename = "organizer.log",
+    level = logging.INFO,
+    format = "%(asctime)s - %(levelname)s - %(message)s"
+)
 
 def get_files(target):
     files = []
     for f in os.listdir(target):
         full_path = os.path.join(target, f)
-        if os.path.isfile(full_path) and f != "organizer.py":
+        if os.path.isfile(full_path) and f not in ["organizer.py", "organizer.log"]:
             files.append(f)
     return files
 
@@ -25,6 +32,7 @@ def organize_files(target):
         src = os.path.join(target, f)
         dst = os.path.join(dest, f)
         shutil.move(src, dst)
+        logging.info(f"Moved {f} -> {folder_name}/")
         print(f"Moved {f} -> {folder_name}/")
 
 def get_file_hash(filepath):
@@ -49,6 +57,7 @@ def find_duplicates(target):
             continue
         if file_hash in hashes:
             duplicates.append((f, hashes[file_hash]))
+            logging.warning(f"Duplicate found: {f} is a copy of {original}")
         else:
             hashes[file_hash] = f
     return duplicates

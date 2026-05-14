@@ -1,6 +1,7 @@
 import os
 import shutil
 import hashlib
+import argparse
 
 def get_files(target):
     files = []
@@ -53,13 +54,18 @@ def find_duplicates(target):
     return duplicates
 
 if __name__ == "__main__":
-    target = "."
-    print("Scanning for duplicates...")
-    dupes = find_duplicates(target)
+    parser = argparse.ArgumentParser(description="Smart File Organizer")
+    parser.add_argument("--path", type=str, default=".", help="Path to folder to organize")
+    parser.add_argument("--scan", action="store_true", help="Scan for duplicates only")
+    args = parser.parse_args()
+
+    print(f"Scanning {args.path} for duplicates...")
+    dupes = find_duplicates(args.path)
     if dupes:
         for dupe, original in dupes:
             print(f"Duplicate found: {dupe} is a copy of {original}")
     else:
         print("No duplicates found.")
 
-    organize_files(target)
+    if not args.scan:
+        organize_files(args.path)
